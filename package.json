@@ -1,0 +1,19 @@
+{
+  "name": "aerofiles",
+  "version": "0.0.0",
+  "description": "waypoint, task, tracklog readers and writers for aviation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Turbo87/aerofiles-js.git"
+  },
+  "author": "tobias.bieniek@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Turbo87/aerofiles-js/issues"
+  },
+  "homepage": "https://github.com/Turbo87/aerofiles-js#readme"
+}
