@@ -8,6 +8,17 @@ const IGC_FILES = glob.sync('test/fixtures/*.igc', { nocase: true });
 const NEWLINE_RE = /\r\n|\r|\n/;
 
 describe('IGC module', function() {
+  describe('parse()', function() {
+    IGC_FILES.forEach(file => {
+      it(`parses ${file} without throwing exceptions`, function() {
+        const content = fs.readFileSync(file, { encoding: 'utf8' });
+        const result = IGC.parse(content);
+        expect(result.headers.length).to.be.above(1);
+        expect(result.fixes.length).to.be.above(100);
+      });
+    })
+  });
+
   describe('parseBRecord()', function() {
     it('parses valid B record', function() {
       const input = 'B1056335049317N00610998EA001850019300611109104011';

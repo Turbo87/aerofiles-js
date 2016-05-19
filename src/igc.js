@@ -1,5 +1,33 @@
 const B_RECORD_RE = /^B(\d{2})(\d{2})(\d{2})(\d{2})(\d{5})([NS])(\d{3})(\d{5})([EW])([AV])(\d{5})(\d{5})/;
 const H_RECORD_RE = /^H([FO])([A-Z0-9]{3})(?:([^:]*):)?(.*)$/;
+const NEWLINE_RE = /\r\n|\r|\n/;
+
+export function parse(text) {
+  let headers = [];
+  let fixes = [];
+
+  text.split(NEWLINE_RE).forEach(line => {
+    const firstChar = line[0];
+    switch (firstChar) {
+      case 'H': {
+        const record = parseHRecord(line);
+        if (record) {
+          headers.push(record);
+        }
+        break;
+      }
+      case 'B': {
+        const record = parseBRecord(line);
+        if (record) {
+          fixes.push(record);
+        }
+        break;
+      }
+    }
+  });
+
+  return {headers, fixes};
+}
 
 export function parseBRecord(line) {
   const match = B_RECORD_RE.exec(line);
