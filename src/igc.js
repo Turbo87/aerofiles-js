@@ -15,7 +15,7 @@ export function parse(text) {
 
     switch (firstChar) {
       case 'H': {
-        record = parseHRecord(line);
+        record = HRecord.fromLine(line);
         if (record) {
           if (record.subject === 'DTE') {
             date = record.date;
@@ -27,7 +27,7 @@ export function parse(text) {
       }
 
       case 'B': {
-        record = parseBRecord(line);
+        record = BRecord.fromLine(line);
         if (record) {
           fixes.push(record);
         }
@@ -63,7 +63,7 @@ export function parseRecords(text) {
 }
 
 export function parseRecord(line) {
-  return parseBRecord(line) || parseHRecord(line) || {type: line[0]};
+  return BRecord.fromLine(line) || HRecord.fromLine(line) || {type: line[0]};
 }
 
 export class Record {
@@ -98,10 +98,6 @@ export class BRecord extends Record {
   }
 }
 
-export function parseBRecord(line) {
-  return BRecord.fromLine(line);
-}
-
 export class HRecord extends Record {
   static fromLine(line) {
     const match = H_RECORD_RE.exec(line);
@@ -127,8 +123,4 @@ export class HRecord extends Record {
       return new HRecord(result);
     }
   }
-}
-
-export function parseHRecord(line) {
-  return HRecord.fromLine(line);
 }
