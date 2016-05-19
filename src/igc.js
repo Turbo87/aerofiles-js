@@ -65,7 +65,15 @@ export function parseRecord(line) {
   return parseBRecord(line) || parseHRecord(line) || {type: line[0]};
 }
 
-export class BRecord {
+export class Record {
+  constructor(values) {
+    for (let key in values) {
+      this[key] = values[key];
+    }
+  }
+}
+
+export class BRecord extends Record {
   static fromLine(line) {
     const match = B_RECORD_RE.exec(line);
     if (match) {
@@ -89,19 +97,13 @@ export class BRecord {
       return new BRecord({hour, minute, second, longitude, latitude, altitudeGPS, altitudeBaro});
     }
   }
-
-  constructor(values) {
-    for (let key in values) {
-      this[key] = values[key];
-    }
-  }
 }
 
 export function parseBRecord(line) {
   return BRecord.fromLine(line);
 }
 
-export class HRecord {
+export class HRecord extends Record {
   static fromLine(line) {
     const match = H_RECORD_RE.exec(line);
     if (match) {
@@ -124,12 +126,6 @@ export class HRecord {
       }
 
       return new HRecord(result);
-    }
-  }
-
-  constructor(values) {
-    for (let key in values) {
-      this[key] = values[key];
     }
   }
 }
