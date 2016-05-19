@@ -1,6 +1,11 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
+import glob from 'glob';
+import fs from 'fs';
 import { parseBRecord } from '../src/igc';
+
+const IGC_FILES = glob.sync('test/fixtures/*.igc', { nocase: true });
+const NEWLINE_RE = /\r\n|\r|\n/;
 
 describe('IGC module', function() {
   describe('parseBRecord()', function() {
@@ -10,5 +15,15 @@ describe('IGC module', function() {
       expect(result.latitude).to.be.closeTo(50 + 49.317 / 60, 0.00001);
       expect(result.longitude).to.be.closeTo(6 + 10.998 / 60, 0.00001);
     });
+
+    IGC_FILES.forEach(file => {
+      it(`parses ${file} without throwing exceptions`, function() {
+        fs.readFileSync(file, { encoding: 'utf8' }).split(NEWLINE_RE).forEach(line => {
+          if (line[0] === 'B') {
+            expect(parseBRecord(line), `parseBRecord('${line}')`).to.be.ok;
+          }
+        });
+      });
+    })
   });
 });
