@@ -136,16 +136,23 @@ export class HRecord extends Record {
   }
 }
 
-export class IRecord extends Record {
+export class ExtensionsRecord extends Record {
+  static readExtensions(line) {
+    let extensions = [];
+
+    let n = parseInt(line.slice(1, 3), 10);
+    for (let i = 0; i < n; i++) {
+      extensions.push(RecordExtension.fromSlice(line, 3 + i * 7));
+    }
+
+    return extensions;
+  }
+}
+
+export class IRecord extends ExtensionsRecord {
   static fromLine(line) {
     if (line[0] === 'I') {
-      let extensions = [];
-
-      let n = parseInt(line.slice(1, 3), 10);
-      for (let i = 0; i < n; i++) {
-        extensions.push(RecordExtension.fromSlice(line, 3 + i * 7));
-      }
-
+      let extensions = this.readExtensions(line);
       return new IRecord({extensions});
     }
   }
