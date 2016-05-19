@@ -6,7 +6,6 @@ import * as IGC from '../src/igc';
 import { LocalDate, LocalTime, ZonedDateTime } from 'js-joda';
 
 const IGC_FILES = glob.sync('test/fixtures/*.igc', { nocase: true });
-const NEWLINE_RE = /\r\n|\r|\n/;
 
 describe('IGC module', function() {
   describe('parse()', function() {
@@ -58,16 +57,6 @@ describe('IGC module', function() {
       expect(result.altitudeGPS).to.equal(185);
       expect(result.altitudeBaro).to.equal(193);
     });
-
-    IGC_FILES.forEach(file => {
-      it(`parses ${file} without throwing exceptions`, function() {
-        fs.readFileSync(file, { encoding: 'utf8' }).split(NEWLINE_RE).forEach(line => {
-          if (line[0] === 'B') {
-            expect(IGC.BRecord.fromLine(line), `BRecord.fromLine('${line}')`).to.be.ok;
-          }
-        });
-      });
-    })
   });
 
   describe('HRecord.fromLine()', function() {
@@ -98,19 +87,5 @@ describe('IGC module', function() {
       expect(result.description).to.not.be.ok;
       expect(result.value).to.equal('uBLOX LEA-6DUAL,50,max50000m');
     });
-
-    IGC_FILES.forEach(file => {
-      it(`parses ${file} without throwing exceptions`, function() {
-        fs.readFileSync(file, { encoding: 'utf8' }).split(NEWLINE_RE).forEach(line => {
-          if (line[0] === 'H') {
-            var result = IGC.HRecord.fromLine(line);
-            expect(result, `HRecord.fromLine('${line}')`).to.be.ok;
-            expect(result.source).to.be.ok;
-            expect(result.subject).to.be.ok;
-            expect(result.value).to.not.be.undefined;
-          }
-        });
-      });
-    })
   });
 });
