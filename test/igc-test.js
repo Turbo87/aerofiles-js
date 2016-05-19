@@ -142,4 +142,15 @@ describe('IGC module', function() {
       }]);
     });
   });
+
+  describe('JRecord.fromLine()', function() {
+    it('correctly parses J010812HDT', function() {
+      let result = IGC.JRecord.fromLine('J010812HDT');
+      expect(result.extensions).to.deep.equal([{
+        start: 8,
+        end: 12,
+        code: 'HDT',
+      }]);
+    });
+  });
 });

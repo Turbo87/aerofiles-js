@@ -158,6 +158,15 @@ export class IRecord extends ExtensionsRecord {
   }
 }
 
+export class JRecord extends ExtensionsRecord {
+  static fromLine(line) {
+    if (line[0] === 'J') {
+      let extensions = this.readExtensions(line);
+      return new JRecord({extensions});
+    }
+  }
+}
+
 export class RecordExtension {
   static fromSlice(line, offset) {
     let start = parseInt(line.slice(offset, offset + 2), 10);
