@@ -101,29 +101,41 @@ export function parseBRecord(line) {
   return BRecord.fromLine(line);
 }
 
-export function parseHRecord(line) {
-  const match = H_RECORD_RE.exec(line);
-  if (match) {
-    var source = match[1];
-    var subject = match[2];
-    var description = match[3];
-    var value = match[4];
+export class HRecord {
+  static fromLine(line) {
+    const match = H_RECORD_RE.exec(line);
+    if (match) {
+      var source = match[1];
+      var subject = match[2];
+      var description = match[3];
+      var value = match[4];
 
-    var result = {type:'H', source, subject, description, value};
+      var result = {source, subject, description, value};
 
-    if (subject === 'DTE') {
-      var day = parseInt(value.slice(0, 2), 10);
-      var month = parseInt(value.slice(2, 4), 10);
-      var year = 2000 + parseInt(value.slice(4, 6), 10);
-      if (year > 2090) {
-        year -= 100;
+      if (subject === 'DTE') {
+        var day = parseInt(value.slice(0, 2), 10);
+        var month = parseInt(value.slice(2, 4), 10);
+        var year = 2000 + parseInt(value.slice(4, 6), 10);
+        if (year > 2090) {
+          year -= 100;
+        }
+
+        result.date = new LocalDate(year, month, day);
       }
 
-      result.date = new LocalDate(year, month, day);
+      return new HRecord(result);
     }
-
-    return result;
   }
+
+  constructor(values) {
+    for (let key in values) {
+      this[key] = values[key];
+    }
+  }
+}
+
+export function parseHRecord(line) {
+  return HRecord.fromLine(line);
 }
 
 class LocalDate {
