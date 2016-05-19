@@ -2,7 +2,7 @@ import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import glob from 'glob';
 import fs from 'fs';
-import { parseBRecord, parseHRecord } from '../src/igc';
+import * as IGC from '../src/igc';
 
 const IGC_FILES = glob.sync('test/fixtures/*.igc', { nocase: true });
 const NEWLINE_RE = /\r\n|\r|\n/;
@@ -11,7 +11,7 @@ describe('IGC module', function() {
   describe('parseBRecord()', function() {
     it('parses valid B record', function() {
       const input = 'B1056335049317N00610998EA001850019300611109104011';
-      const result = parseBRecord(input);
+      const result = IGC.parseBRecord(input);
       expect(result.hour).to.equal(10);
       expect(result.minute).to.equal(56);
       expect(result.second).to.equal(33);
@@ -25,7 +25,7 @@ describe('IGC module', function() {
       it(`parses ${file} without throwing exceptions`, function() {
         fs.readFileSync(file, { encoding: 'utf8' }).split(NEWLINE_RE).forEach(line => {
           if (line[0] === 'B') {
-            expect(parseBRecord(line), `parseBRecord('${line}')`).to.be.ok;
+            expect(IGC.parseBRecord(line), `parseBRecord('${line}')`).to.be.ok;
           }
         });
       });
@@ -35,7 +35,7 @@ describe('IGC module', function() {
   describe('parseHRecord()', function() {
     it('parses HFDTE record', function() {
       const input = 'HFDTE160516';
-      const result = parseHRecord(input);
+      const result = IGC.parseHRecord(input);
       expect(result.source).to.equal('F');
       expect(result.subject).to.equal('DTE');
       expect(result.description).to.not.be.ok;
@@ -44,7 +44,7 @@ describe('IGC module', function() {
 
     it('parses HFGTY record', function() {
       const input = 'HFGTYGLIDERTYPE:ASG32 MI';
-      const result = parseHRecord(input);
+      const result = IGC.parseHRecord(input);
       expect(result.source).to.equal('F');
       expect(result.subject).to.equal('GTY');
       expect(result.description).to.equal('GLIDERTYPE');
@@ -53,7 +53,7 @@ describe('IGC module', function() {
 
     it('parses HFGPS record', function() {
       const input = 'HFGPS:uBLOX LEA-6DUAL,50,max50000m';
-      const result = parseHRecord(input);
+      const result = IGC.parseHRecord(input);
       expect(result.source).to.equal('F');
       expect(result.subject).to.equal('GPS');
       expect(result.description).to.not.be.ok;
@@ -64,7 +64,7 @@ describe('IGC module', function() {
       it(`parses ${file} without throwing exceptions`, function() {
         fs.readFileSync(file, { encoding: 'utf8' }).split(NEWLINE_RE).forEach(line => {
           if (line[0] === 'H') {
-            var result = parseHRecord(line);
+            var result = IGC.parseHRecord(line);
             expect(result, `parseHRecord('${line}')`).to.be.ok;
             expect(result.source).to.be.ok;
             expect(result.subject).to.be.ok;
