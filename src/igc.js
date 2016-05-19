@@ -9,49 +9,35 @@ export function parse(text) {
   let headers = [];
   let fixes = [];
 
-  text.split(NEWLINE_RE).forEach(line => {
-    const firstChar = line[0];
-    let record;
+  parseRecords(text).forEach(record => {
+    if (record instanceof BRecord) {
+      fixes.push(record);
 
-    switch (firstChar) {
-      case 'H': {
-        record = HRecord.fromLine(line);
-        if (record) {
-          if (record.subject === 'DTE') {
-            date = record.date;
-          }
-
-          headers.push(record);
-        }
-        break;
+    } else if (record instanceof HRecord) {
+      if (record.subject == 'DTE') {
+        date = record.date;
       }
 
-      case 'B': {
-        record = BRecord.fromLine(line);
-        if (record) {
-          fixes.push(record);
-        }
-        break;
-      }
+      headers.push(record);
     }
 
-    if (record && record.time && date) {
-      let time = record.time;
+    if (record.time) {
+      if (date) {
+        // Handle UTC-midnight wrap-around
+        // i.e. time jumps of 12 hours or more will increase/decrease the date
 
-      // Handle UTC-midnight wrap-around
-      // i.e. time jumps of 12 hours or more will increase/decrease the date
-
-      if (lastTime) {
-        if (lastTime.hour() == 23 && time.hour() == 0) {
-          date = date.plusDays(1);
-        } else if (lastTime.hour() == 0 && time.hour() == 23) {
-          date = date.minusDays(1);
+        if (lastTime) {
+          if (lastTime.hour() == 23 && record.time.hour() == 0) {
+            date = date.plusDays(1);
+          } else if (lastTime.hour() == 0 && record.time.hour() == 23) {
+            date = date.minusDays(1);
+          }
         }
+
+        record.datetime = record.time.atDate(date).atZone(ZoneOffset.UTC);
       }
 
-      lastTime = time;
-
-      record.datetime = time.atDate(date).atZone(ZoneOffset.UTC);
+      lastTime = record.time;
     }
   });
 
