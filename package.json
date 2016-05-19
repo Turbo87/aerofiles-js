@@ -2,9 +2,11 @@
   "name": "aerofiles",
   "version": "0.0.0",
   "description": "waypoint, task, tracklog readers and writers for aviation",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "test": "mocha"
+    "compile": "babel -d lib/ src/",
+    "prepublish": "npm run compile",
+    "test": "mocha --compilers js:babel-core/register"
   },
   "repository": {
     "type": "git",
@@ -17,6 +19,9 @@
   },
   "homepage": "https://github.com/Turbo87/aerofiles-js#readme",
   "devDependencies": {
+    "babel-cli": "^6.9.0",
+    "babel-core": "^6.9.0",
+    "babel-preset-es2015": "^6.9.0",
     "chai": "^3.5.0",
     "mocha": "^2.4.5"
   }
