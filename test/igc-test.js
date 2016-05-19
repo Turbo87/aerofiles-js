@@ -45,12 +45,13 @@ describe('IGC module', function() {
 
   describe('parseHRecord()', function() {
     it('parses HFDTE record', function() {
-      const input = 'HFDTE160516';
+      const input = 'HFDTE140516';
       const result = IGC.parseHRecord(input);
       expect(result.source).to.equal('F');
       expect(result.subject).to.equal('DTE');
       expect(result.description).to.not.be.ok;
-      expect(result.value).to.equal('160516');
+      expect(result.value).to.equal('140516');
+      expect(result.date).to.deep.equal({ day: 14, month: 5, year: 2016 });
     });
 
     it('parses HFGTY record', function() {

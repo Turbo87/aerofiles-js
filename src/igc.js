@@ -61,6 +61,19 @@ export function parseHRecord(line) {
     var description = match[3];
     var value = match[4];
 
-    return {source, subject, description, value};
+    var result = {source, subject, description, value};
+
+    if (subject === 'DTE') {
+      var day = parseInt(value.slice(0, 2), 10);
+      var month = parseInt(value.slice(2, 4), 10);
+      var year = 2000 + parseInt(value.slice(4, 6), 10);
+      if (year > 2090) {
+        year -= 100;
+      }
+
+      result.date = {day, month, year};
+    }
+
+    return result;
   }
 }
