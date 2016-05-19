@@ -2,6 +2,7 @@ import { LocalDate, LocalTime, ZoneOffset } from 'js-joda';
 
 const A_RECORD_RE = /^A(\w{3})(\w+)(?::(.*))?$/;
 const B_RECORD_RE = /^B(\d{2})(\d{2})(\d{2})(\d{2})(\d{5})([NS])(\d{3})(\d{5})([EW])([AV])(\d{5})(\d{5})/;
+const E_RECORD_RE = /^E(\d{2})(\d{2})(\d{2})(\w{3})(.*)/;
 const H_RECORD_RE = /^H([FO])([A-Z0-9]{3})(?:([^:]*):)?(.*)$/;
 const NEWLINE_RE = /\r\n|\r|\n/;
 
@@ -52,6 +53,7 @@ export function parseRecords(text) {
 export function parseRecord(line) {
   return BRecord.fromLine(line) ||
     HRecord.fromLine(line) ||
+    ERecord.fromLine(line) ||
     ARecord.fromLine(line) ||
     IRecord.fromLine(line) ||
     JRecord.fromLine(line) ||
@@ -107,6 +109,19 @@ export class BRecord extends Record {
       let altitudeBaro = parseInt(match[12], 10);
 
       return new BRecord({time, longitude, latitude, altitudeGPS, altitudeBaro});
+    }
+  }
+}
+
+export class ERecord extends Record {
+  static fromLine(line) {
+    const match = E_RECORD_RE.exec(line);
+    if (match) {
+      let time = LocalTime.of(parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10));
+      let code = match[4];
+      let data = match[5];
+
+      return new ERecord({time, code, data});
     }
   }
 }

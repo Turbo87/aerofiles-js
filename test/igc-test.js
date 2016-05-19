@@ -77,6 +77,15 @@ describe('IGC module', function() {
     });
   });
 
+  describe('ERecord.fromLine()', function() {
+    it('correctly parses E104544ATS102312', function() {
+      let result = IGC.ERecord.fromLine('E104544ATS102312');
+      expect(result.time).to.deep.equal(LocalTime.parse('10:45:44'));
+      expect(result.code).to.equal('ATS');
+      expect(result.data).to.equal('102312');
+    });
+  });
+
   describe('HRecord.fromLine()', function() {
     it('parses HFDTE record', function() {
       const input = 'HFDTE140516';
