@@ -30,7 +30,7 @@ describe('IGC module', function() {
         const content = fs.readFileSync(file, { encoding: 'utf8' });
         const result = IGC.parse(content);
         expect(result.headers.length).to.be.above(1);
-        expect(result.fixes.length).to.be.above(100);
+        expect(result.fixes.length).to.be.above(5);
       });
     })
   });
@@ -40,9 +40,9 @@ describe('IGC module', function() {
       it(`parses ${file} without throwing exceptions`, function() {
         const content = fs.readFileSync(file, { encoding: 'utf8' });
         const result = IGC.parseRecords(content);
-        expect(result.length).to.be.above(100);
+        expect(result.length).to.be.above(25);
         expect(result.filter(it => it instanceof IGC.HRecord).length).to.be.above(5);
-        expect(result.filter(it => it instanceof IGC.BRecord).length).to.be.above(100);
+        expect(result.filter(it => it instanceof IGC.BRecord).length).to.be.above(5);
       });
     })
   });
