@@ -35,6 +35,18 @@ describe('IGC module', function() {
     })
   });
 
+  describe('parseRecords()', function() {
+    IGC_FILES.forEach(file => {
+      it(`parses ${file} without throwing exceptions`, function() {
+        const content = fs.readFileSync(file, { encoding: 'utf8' });
+        const result = IGC.parseRecords(content);
+        expect(result.length).to.be.above(100);
+        expect(result.filter(it => it.type === 'H').length).to.be.above(5);
+        expect(result.filter(it => it.type === 'B').length).to.be.above(100);
+      });
+    })
+  });
+
   describe('parseBRecord()', function() {
     it('parses valid B record', function() {
       const input = 'B1056335049317N00610998EA001850019300611109104011';

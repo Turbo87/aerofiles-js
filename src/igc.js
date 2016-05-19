@@ -57,6 +57,14 @@ export function parse(text) {
   return {headers, fixes};
 }
 
+export function parseRecords(text) {
+  return text.split(NEWLINE_RE).map(parseRecord);
+}
+
+export function parseRecord(line) {
+  return parseBRecord(line) || parseHRecord(line) || {type: line[0]};
+}
+
 export function parseBRecord(line) {
   const match = B_RECORD_RE.exec(line);
   if (match) {
@@ -77,7 +85,7 @@ export function parseBRecord(line) {
     let altitudeGPS = parseInt(match[11], 10);
     let altitudeBaro = parseInt(match[12], 10);
 
-    return {hour, minute, second, longitude, latitude, altitudeGPS, altitudeBaro};
+    return {type:'B', hour, minute, second, longitude, latitude, altitudeGPS, altitudeBaro};
   }
 }
 
@@ -89,7 +97,7 @@ export function parseHRecord(line) {
     var description = match[3];
     var value = match[4];
 
-    var result = {source, subject, description, value};
+    var result = {type:'H', source, subject, description, value};
 
     if (subject === 'DTE') {
       var day = parseInt(value.slice(0, 2), 10);
