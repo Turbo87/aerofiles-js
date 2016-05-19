@@ -143,15 +143,27 @@ export class IRecord extends Record {
 
       let n = parseInt(line.slice(1, 3), 10);
       for (let i = 0; i < n; i++) {
-        var offset = 3 + i * 7;
-        let start = parseInt(line.slice(offset, offset + 2), 10);
-        let end = parseInt(line.slice(offset + 2, offset + 4), 10);
-        let code = line.slice(offset + 4, offset + 7);
-        extensions.push({start, end, code});
+        extensions.push(RecordExtension.fromSlice(line, 3 + i * 7));
       }
 
       return new IRecord({extensions});
     }
+  }
+}
+
+export class RecordExtension {
+  static fromSlice(line, offset) {
+    let start = parseInt(line.slice(offset, offset + 2), 10);
+    let end = parseInt(line.slice(offset + 2, offset + 4), 10);
+    let code = line.slice(offset + 4, offset + 7);
+
+    return new RecordExtension(start, end, code);
+  }
+
+  constructor(start, end, code) {
+    this.start = start;
+    this.end = end;
+    this.code = code;
   }
 }
 
