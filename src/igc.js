@@ -3,26 +3,54 @@ const H_RECORD_RE = /^H([FO])([A-Z0-9]{3})(?:([^:]*):)?(.*)$/;
 const NEWLINE_RE = /\r\n|\r|\n/;
 
 export function parse(text) {
+  let date, lastTime;
   let headers = [];
   let fixes = [];
 
   text.split(NEWLINE_RE).forEach(line => {
     const firstChar = line[0];
+    let record;
+
     switch (firstChar) {
       case 'H': {
-        const record = parseHRecord(line);
+        record = parseHRecord(line);
         if (record) {
+          if (record.subject === 'DTE') {
+            date = record.date;
+          }
+
           headers.push(record);
         }
         break;
       }
+
       case 'B': {
-        const record = parseBRecord(line);
+        record = parseBRecord(line);
         if (record) {
           fixes.push(record);
         }
         break;
       }
+    }
+
+    if (record && date && record.hour !== undefined) {
+      record.time = date.toTimestamp(record);
+
+      // Handle UTC-midnight wrap-around
+      // i.e. time jumps of 12 hours or more will increase/decrease the date
+
+      if (lastTime) {
+        if (lastTime - record.time > 12 * 60 * 60 * 1000) {
+          date = date.next();
+          record.time = date.toTimestamp(record);
+
+        } else if (record.time - lastTime > 12 * 60 * 60 * 1000) {
+          date = date.previous();
+          record.time = date.toTimestamp(record);
+        }
+      }
+
+      lastTime = record.time;
     }
   });
 
@@ -83,5 +111,21 @@ class LocalDate {
     this.year = year;
     this.month = month;
     this.day = day;
+  }
+
+  next() {
+    let timestamp = Date.UTC(this.year, this.month, this.day) + 24 * 60 * 60 * 1000;
+    let nextDate = new Date(timestamp);
+    return new LocalDate(nextDate.getUTCFullYear(), nextDate.getUTCMonth() + 1, nextDate.getUTCDay());
+  }
+
+  previous() {
+    let timestamp = Date.UTC(this.year, this.month, this.day) - 24 * 60 * 60 * 1000;
+    let nextDate = new Date(timestamp);
+    return new LocalDate(nextDate.getUTCFullYear(), nextDate.getUTCMonth() + 1, nextDate.getUTCDay());
+  }
+
+  toTimestamp({hour, minute, second}) {
+    return Date.UTC(this.year, this.month - 1, this.day, hour, minute, second);
   }
 }

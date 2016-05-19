@@ -9,6 +9,22 @@ const NEWLINE_RE = /\r\n|\r|\n/;
 
 describe('IGC module', function() {
   describe('parse()', function() {
+    it('handles UTC-midnight crossing', function() {
+      const content = fs.readFileSync('test/fixtures/2016-05-13-xcs-aaa-01_2.igc', { encoding: 'utf8' });
+      const result = IGC.parse(content);
+
+      let lastFix;
+      result.fixes.forEach(fix => {
+        expect(fix.time, 'fix.time').to.be.a('number');
+
+        if (lastFix) {
+          expect(fix.time, 'fix.time').to.not.be.below(lastFix.time, new Date(fix.time) + ' => ' + new Date(lastFix.time));
+        }
+
+        lastFix = fix;
+      })
+    });
+
     IGC_FILES.forEach(file => {
       it(`parses ${file} without throwing exceptions`, function() {
         const content = fs.readFileSync(file, { encoding: 'utf8' });
