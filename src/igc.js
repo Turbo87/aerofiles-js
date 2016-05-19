@@ -65,28 +65,40 @@ export function parseRecord(line) {
   return parseBRecord(line) || parseHRecord(line) || {type: line[0]};
 }
 
-export function parseBRecord(line) {
-  const match = B_RECORD_RE.exec(line);
-  if (match) {
-    var hour = parseInt(match[1], 10);
-    var minute = parseInt(match[2], 10);
-    var second = parseInt(match[3], 10);
+export class BRecord {
+  static fromLine(line) {
+    const match = B_RECORD_RE.exec(line);
+    if (match) {
+      var hour = parseInt(match[1], 10);
+      var minute = parseInt(match[2], 10);
+      var second = parseInt(match[3], 10);
 
-    let latitude = parseInt(match[4], 10) + parseInt(match[5], 10) / 60000;
-    if (match[6] == 'S') {
-      latitude = -latitude;
+      let latitude = parseInt(match[4], 10) + parseInt(match[5], 10) / 60000;
+      if (match[6] == 'S') {
+        latitude = -latitude;
+      }
+
+      let longitude = parseInt(match[7], 10) + parseInt(match[8], 10) / 60000;
+      if (match[9] == 'W') {
+        longitude = -longitude;
+      }
+
+      let altitudeGPS = parseInt(match[11], 10);
+      let altitudeBaro = parseInt(match[12], 10);
+
+      return new BRecord({hour, minute, second, longitude, latitude, altitudeGPS, altitudeBaro});
     }
-
-    let longitude = parseInt(match[7], 10) + parseInt(match[8], 10) / 60000;
-    if (match[9] == 'W') {
-      longitude = -longitude;
-    }
-
-    let altitudeGPS = parseInt(match[11], 10);
-    let altitudeBaro = parseInt(match[12], 10);
-
-    return {type:'B', hour, minute, second, longitude, latitude, altitudeGPS, altitudeBaro};
   }
+
+  constructor(values) {
+    for (let key in values) {
+      this[key] = values[key];
+    }
+  }
+}
+
+export function parseBRecord(line) {
+  return BRecord.fromLine(line);
 }
 
 export function parseHRecord(line) {

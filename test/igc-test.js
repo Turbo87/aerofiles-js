@@ -42,7 +42,7 @@ describe('IGC module', function() {
         const result = IGC.parseRecords(content);
         expect(result.length).to.be.above(100);
         expect(result.filter(it => it.type === 'H').length).to.be.above(5);
-        expect(result.filter(it => it.type === 'B').length).to.be.above(100);
+        expect(result.filter(it => it instanceof IGC.BRecord).length).to.be.above(100);
       });
     })
   });
