@@ -1,5 +1,6 @@
 import { LocalDate, LocalTime, ZoneOffset } from 'js-joda';
 
+const A_RECORD_RE = /^A(\w{3})(\w+)(?::(.*))?$/;
 const B_RECORD_RE = /^B(\d{2})(\d{2})(\d{2})(\d{2})(\d{5})([NS])(\d{3})(\d{5})([EW])([AV])(\d{5})(\d{5})/;
 const H_RECORD_RE = /^H([FO])([A-Z0-9]{3})(?:([^:]*):)?(.*)$/;
 const NEWLINE_RE = /\r\n|\r|\n/;
@@ -59,6 +60,27 @@ export class Record {
   constructor(values) {
     for (let key in values) {
       this[key] = values[key];
+    }
+  }
+}
+
+export class ARecord extends Record {
+  static fromLine(line) {
+    const match = A_RECORD_RE.exec(line);
+    if (match) {
+      let manufacturer = match[1];
+      let id = match[2];
+      let data = match[3];
+      let flightNumber;
+
+      // Special handling for LX devices
+      if (endsWith(id, 'FLIGHT')) {
+        id = id.slice(0, 3);
+        flightNumber = parseInt(data, 10);
+        data = undefined;
+      }
+
+      return new ARecord({manufacturer, id, flightNumber, data});
     }
   }
 }
@@ -131,4 +153,8 @@ export class IRecord extends Record {
       return new IRecord({extensions});
     }
   }
+}
+
+function endsWith(str, suffix) {
+  return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }

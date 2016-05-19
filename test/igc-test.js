@@ -47,6 +47,24 @@ describe('IGC module', function() {
     })
   });
 
+  describe('ARecord.fromLine()', function() {
+    it('correctly parses AFLA9KJ', function() {
+      let result = IGC.ARecord.fromLine('AFLA9KJ');
+      expect(result.manufacturer).to.equal('FLA');
+      expect(result.id).to.equal('9KJ');
+      expect(result.data).to.not.be.ok;
+      expect(result.flightNumber).to.not.be.ok;
+    });
+
+    it('correctly parses ALXV2OWFLIGHT:1', function() {
+      let result = IGC.ARecord.fromLine('ALXV2OWFLIGHT:1');
+      expect(result.manufacturer).to.equal('LXV');
+      expect(result.id).to.equal('2OW');
+      expect(result.data).to.not.be.ok;
+      expect(result.flightNumber).to.equal(1);
+    });
+  });
+
   describe('BRecord.fromLine()', function() {
     it('parses valid B record', function() {
       const input = 'B1056335049317N00610998EA001850019300611109104011';
