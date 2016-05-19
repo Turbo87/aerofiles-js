@@ -88,4 +88,40 @@ describe('IGC module', function() {
       expect(result.value).to.equal('uBLOX LEA-6DUAL,50,max50000m');
     });
   });
+
+  describe('IRecord.fromLine()', function() {
+    it('correctly parses I023638FXA3940SIU', function() {
+      let result = IGC.IRecord.fromLine('I023638FXA3940SIU');
+      expect(result.extensions).to.deep.equal([{
+        start: 36,
+        end: 38,
+        code: 'FXA',
+      }, {
+        start: 39,
+        end: 40,
+        code: 'SIU',
+      }]);
+    });
+
+    it('correctly parses I043638FXA3941ENL4246GSP4749TRT', function() {
+      let result = IGC.IRecord.fromLine('I043638FXA3941ENL4246GSP4749TRT');
+      expect(result.extensions).to.deep.equal([{
+        start: 36,
+        end: 38,
+        code: 'FXA',
+      }, {
+        start: 39,
+        end: 41,
+        code: 'ENL',
+      }, {
+        start: 42,
+        end: 46,
+        code: 'GSP',
+      }, {
+        start: 47,
+        end: 49,
+        code: 'TRT',
+      }]);
+    });
+  });
 });

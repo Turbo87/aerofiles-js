@@ -49,7 +49,10 @@ export function parseRecords(text) {
 }
 
 export function parseRecord(line) {
-  return BRecord.fromLine(line) || HRecord.fromLine(line) || {type: line[0]};
+  return BRecord.fromLine(line) ||
+    HRecord.fromLine(line) ||
+    IRecord.fromLine(line) ||
+    {type: line[0]};
 }
 
 export class Record {
@@ -107,6 +110,25 @@ export class HRecord extends Record {
       }
 
       return new HRecord(result);
+    }
+  }
+}
+
+export class IRecord extends Record {
+  static fromLine(line) {
+    if (line[0] === 'I') {
+      let extensions = [];
+
+      let n = parseInt(line.slice(1, 3), 10);
+      for (let i = 0; i < n; i++) {
+        var offset = 3 + i * 7;
+        let start = parseInt(line.slice(offset, offset + 2), 10);
+        let end = parseInt(line.slice(offset + 2, offset + 4), 10);
+        let code = line.slice(offset + 4, offset + 7);
+        extensions.push({start, end, code});
+      }
+
+      return new IRecord({extensions});
     }
   }
 }
