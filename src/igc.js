@@ -57,7 +57,7 @@ export function parseRecord(line) {
     ARecord.fromLine(line) ||
     IRecord.fromLine(line) ||
     JRecord.fromLine(line) ||
-    {type: line[0]};
+    new Record({line});
 }
 
 export class Record {
