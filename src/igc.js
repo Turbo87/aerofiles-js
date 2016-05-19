@@ -33,24 +33,24 @@ export function parse(text) {
       }
     }
 
-    if (record && date && record.hour !== undefined) {
-      record.time = date.toTimestamp(record);
+    if (record && date && record.time) {
+      record.timestamp = date.toTimestamp(record.time);
 
       // Handle UTC-midnight wrap-around
       // i.e. time jumps of 12 hours or more will increase/decrease the date
 
       if (lastTime) {
-        if (lastTime - record.time > 12 * 60 * 60 * 1000) {
+        if (lastTime - record.timestamp > 12 * 60 * 60 * 1000) {
           date = date.next();
-          record.time = date.toTimestamp(record);
+          record.timestamp = date.toTimestamp(record.time);
 
-        } else if (record.time - lastTime > 12 * 60 * 60 * 1000) {
+        } else if (record.timestamp - lastTime > 12 * 60 * 60 * 1000) {
           date = date.previous();
-          record.time = date.toTimestamp(record);
+          record.timestamp = date.toTimestamp(record.time);
         }
       }
 
-      lastTime = record.time;
+      lastTime = record.timestamp;
     }
   });
 
@@ -77,9 +77,11 @@ export class BRecord extends Record {
   static fromLine(line) {
     const match = B_RECORD_RE.exec(line);
     if (match) {
-      var hour = parseInt(match[1], 10);
-      var minute = parseInt(match[2], 10);
-      var second = parseInt(match[3], 10);
+      let time = {
+        hour: parseInt(match[1], 10),
+        minute: parseInt(match[2], 10),
+        second: parseInt(match[3], 10),
+      };
 
       let latitude = parseInt(match[4], 10) + parseInt(match[5], 10) / 60000;
       if (match[6] == 'S') {
@@ -94,7 +96,7 @@ export class BRecord extends Record {
       let altitudeGPS = parseInt(match[11], 10);
       let altitudeBaro = parseInt(match[12], 10);
 
-      return new BRecord({hour, minute, second, longitude, latitude, altitudeGPS, altitudeBaro});
+      return new BRecord({time, longitude, latitude, altitudeGPS, altitudeBaro});
     }
   }
 }

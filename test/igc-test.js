@@ -15,10 +15,10 @@ describe('IGC module', function() {
 
       let lastFix;
       result.fixes.forEach(fix => {
-        expect(fix.time, 'fix.time').to.be.a('number');
+        expect(fix.timestamp, 'fix.timestamp').to.be.a('number');
 
         if (lastFix) {
-          expect(fix.time, 'fix.time').to.not.be.below(lastFix.time, new Date(fix.time) + ' => ' + new Date(lastFix.time));
+          expect(fix.timestamp, 'fix.timestamp').to.not.be.below(lastFix.timestamp);
         }
 
         lastFix = fix;
@@ -51,9 +51,7 @@ describe('IGC module', function() {
     it('parses valid B record', function() {
       const input = 'B1056335049317N00610998EA001850019300611109104011';
       const result = IGC.parseBRecord(input);
-      expect(result.hour).to.equal(10);
-      expect(result.minute).to.equal(56);
-      expect(result.second).to.equal(33);
+      expect(result.time).to.deep.equal({ hour: 10, minute: 56, second: 33 });
       expect(result.latitude).to.be.closeTo(50 + 49.317 / 60, 0.00001);
       expect(result.longitude).to.be.closeTo(6 + 10.998 / 60, 0.00001);
       expect(result.altitudeGPS).to.equal(185);
