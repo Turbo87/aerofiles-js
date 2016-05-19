@@ -52,7 +52,9 @@ export function parseRecords(text) {
 export function parseRecord(line) {
   return BRecord.fromLine(line) ||
     HRecord.fromLine(line) ||
+    ARecord.fromLine(line) ||
     IRecord.fromLine(line) ||
+    JRecord.fromLine(line) ||
     {type: line[0]};
 }
 
