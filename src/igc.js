@@ -1,4 +1,5 @@
 const B_RECORD_RE = /^B(\d{2})(\d{2})(\d{2})(\d{2})(\d{5})([NS])(\d{3})(\d{5})([EW])([AV])(\d{5})(\d{5})/;
+const H_RECORD_RE = /^H([FO])([A-Z0-9]{3})(?:([^:]*):)?(.*)$/;
 
 export function parseBRecord(line) {
   const match = B_RECORD_RE.exec(line);
@@ -21,5 +22,17 @@ export function parseBRecord(line) {
     let altitudeBaro = parseInt(match[12], 10);
 
     return {hour, minute, second, longitude, latitude, altitudeGPS, altitudeBaro};
+  }
+}
+
+export function parseHRecord(line) {
+  const match = H_RECORD_RE.exec(line);
+  if (match) {
+    var source = match[1];
+    var subject = match[2];
+    var description = match[3];
+    var value = match[4];
+
+    return {source, subject, description, value};
   }
 }
