@@ -1,3 +1,5 @@
+import { LocalDate, LocalTime, ZoneOffset } from 'js-joda';
+
 const B_RECORD_RE = /^B(\d{2})(\d{2})(\d{2})(\d{2})(\d{5})([NS])(\d{3})(\d{5})([EW])([AV])(\d{5})(\d{5})/;
 const H_RECORD_RE = /^H([FO])([A-Z0-9]{3})(?:([^:]*):)?(.*)$/;
 const NEWLINE_RE = /\r\n|\r|\n/;
@@ -33,24 +35,23 @@ export function parse(text) {
       }
     }
 
-    if (record && date && record.time) {
-      record.timestamp = date.toTimestamp(record.time);
+    if (record && record.time && date) {
+      let time = record.time;
 
       // Handle UTC-midnight wrap-around
       // i.e. time jumps of 12 hours or more will increase/decrease the date
 
       if (lastTime) {
-        if (lastTime - record.timestamp > 12 * 60 * 60 * 1000) {
-          date = date.next();
-          record.timestamp = date.toTimestamp(record.time);
-
-        } else if (record.timestamp - lastTime > 12 * 60 * 60 * 1000) {
-          date = date.previous();
-          record.timestamp = date.toTimestamp(record.time);
+        if (lastTime.hour() == 23 && time.hour() == 0) {
+          date = date.plusDays(1);
+        } else if (lastTime.hour() == 0 && time.hour() == 23) {
+          date = date.minusDays(1);
         }
       }
 
-      lastTime = record.timestamp;
+      lastTime = time;
+
+      record.datetime = time.atDate(date).atZone(ZoneOffset.UTC);
     }
   });
 
@@ -77,11 +78,7 @@ export class BRecord extends Record {
   static fromLine(line) {
     const match = B_RECORD_RE.exec(line);
     if (match) {
-      let time = {
-        hour: parseInt(match[1], 10),
-        minute: parseInt(match[2], 10),
-        second: parseInt(match[3], 10),
-      };
+      let time = LocalTime.of(parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10));
 
       let latitude = parseInt(match[4], 10) + parseInt(match[5], 10) / 60000;
       if (match[6] == 'S') {
@@ -124,7 +121,7 @@ export class HRecord extends Record {
           year -= 100;
         }
 
-        result.date = new LocalDate(year, month, day);
+        result.date = LocalDate.of(year, month, day);
       }
 
       return new HRecord(result);
@@ -134,28 +131,4 @@ export class HRecord extends Record {
 
 export function parseHRecord(line) {
   return HRecord.fromLine(line);
-}
-
-class LocalDate {
-  constructor(year, month, day) {
-    this.year = year;
-    this.month = month;
-    this.day = day;
-  }
-
-  next() {
-    let timestamp = Date.UTC(this.year, this.month, this.day) + 24 * 60 * 60 * 1000;
-    let nextDate = new Date(timestamp);
-    return new LocalDate(nextDate.getUTCFullYear(), nextDate.getUTCMonth() + 1, nextDate.getUTCDay());
-  }
-
-  previous() {
-    let timestamp = Date.UTC(this.year, this.month, this.day) - 24 * 60 * 60 * 1000;
-    let nextDate = new Date(timestamp);
-    return new LocalDate(nextDate.getUTCFullYear(), nextDate.getUTCMonth() + 1, nextDate.getUTCDay());
-  }
-
-  toTimestamp({hour, minute, second}) {
-    return Date.UTC(this.year, this.month - 1, this.day, hour, minute, second);
-  }
 }

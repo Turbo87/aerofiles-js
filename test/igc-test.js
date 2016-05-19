@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import glob from 'glob';
 import fs from 'fs';
 import * as IGC from '../src/igc';
+import { LocalDate, LocalTime, ZonedDateTime } from 'js-joda';
 
 const IGC_FILES = glob.sync('test/fixtures/*.igc', { nocase: true });
 const NEWLINE_RE = /\r\n|\r|\n/;
@@ -15,10 +16,10 @@ describe('IGC module', function() {
 
       let lastFix;
       result.fixes.forEach(fix => {
-        expect(fix.timestamp, 'fix.timestamp').to.be.a('number');
+        expect(fix.datetime, 'fix.datetime').to.be.an.instanceof(ZonedDateTime);
 
         if (lastFix) {
-          expect(fix.timestamp, 'fix.timestamp').to.not.be.below(lastFix.timestamp);
+          expect(fix.datetime.isAfter(lastFix.datetime), 'fix.datetime.isAfter(lastFix.datetime)').to.be.ok;
         }
 
         lastFix = fix;
@@ -51,7 +52,7 @@ describe('IGC module', function() {
     it('parses valid B record', function() {
       const input = 'B1056335049317N00610998EA001850019300611109104011';
       const result = IGC.parseBRecord(input);
-      expect(result.time).to.deep.equal({ hour: 10, minute: 56, second: 33 });
+      expect(result.time).to.deep.equal(LocalTime.parse('10:56:33'));
       expect(result.latitude).to.be.closeTo(50 + 49.317 / 60, 0.00001);
       expect(result.longitude).to.be.closeTo(6 + 10.998 / 60, 0.00001);
       expect(result.altitudeGPS).to.equal(185);
@@ -77,7 +78,7 @@ describe('IGC module', function() {
       expect(result.subject).to.equal('DTE');
       expect(result.description).to.not.be.ok;
       expect(result.value).to.equal('140516');
-      expect(result.date).to.deep.equal({ day: 14, month: 5, year: 2016 });
+      expect(result.date).to.deep.equal(LocalDate.parse('2016-05-14'));
     });
 
     it('parses HFGTY record', function() {
