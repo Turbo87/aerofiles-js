@@ -36,3 +36,6 @@ jspm_packages
 
 # Transpiled JS files
 lib/
+
+# Generated Documentation
+doc/
