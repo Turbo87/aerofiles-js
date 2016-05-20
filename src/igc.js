@@ -68,6 +68,9 @@ export class Record {
   }
 }
 
+/**
+ * Flight recorder identification record.
+ */
 export class ARecord extends Record {
   static fromLine(line) {
     const match = A_RECORD_RE.exec(line);
@@ -89,6 +92,9 @@ export class ARecord extends Record {
   }
 }
 
+/**
+ * GPS Fix record.
+ */
 export class BRecord extends Record {
   static fromLine(line) {
     const match = B_RECORD_RE.exec(line);
@@ -113,6 +119,9 @@ export class BRecord extends Record {
   }
 }
 
+/**
+ * Event record.
+ */
 export class ERecord extends Record {
   static fromLine(line) {
     const match = E_RECORD_RE.exec(line);
@@ -126,6 +135,9 @@ export class ERecord extends Record {
   }
 }
 
+/**
+ * File header record.
+ */
 export class HRecord extends Record {
   static fromLine(line) {
     const match = H_RECORD_RE.exec(line);
@@ -153,6 +165,10 @@ export class HRecord extends Record {
   }
 }
 
+/**
+ * Base class for `IRecord` and `JRecord`.
+ * @private
+ */
 export class ExtensionsRecord extends Record {
   static readExtensions(line) {
     let extensions = [];
@@ -166,6 +182,9 @@ export class ExtensionsRecord extends Record {
   }
 }
 
+/**
+ * B record extensions record.
+ */
 export class IRecord extends ExtensionsRecord {
   static fromLine(line) {
     if (line[0] === 'I') {
@@ -175,6 +194,9 @@ export class IRecord extends ExtensionsRecord {
   }
 }
 
+/**
+ * K record extensions record.
+ */
 export class JRecord extends ExtensionsRecord {
   static fromLine(line) {
     if (line[0] === 'J') {
