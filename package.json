@@ -26,9 +26,9 @@
     "babel-preset-es2015": "^6.9.0",
     "chai": "^3.5.0",
     "esdoc": "^0.4.7",
-    "eslint": "^2.10.2",
+    "eslint": "^3.9.1",
     "glob": "^7.0.3",
-    "mocha": "^2.4.5"
+    "mocha": "^3.1.2"
   },
   "dependencies": {
     "js-joda": "^1.1.2"
